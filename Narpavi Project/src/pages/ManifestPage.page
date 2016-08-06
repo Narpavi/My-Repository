@@ -1,0 +1,25 @@
+<!-- * Created By: Poornima -TPT
+     * Project Name: M&E Implementation
+     * Created Date: (24-Dec-2015)
+     * Description:
+        1. Page created for Offline Caching Using the HTML5 manifest Attribute. 
+           It stores the form in the browser cache to use it in the offline mode i.e without internet connection.
+        2. Preview of this page is not available as this page does not have any form controls.        
+-->
+
+<apex:page contentType="text/cache-manifest" applyHtmlTag="false" standardStylesheets="false" showHeader="false" controller="ManifestController">CACHE MANIFEST
+
+
+
+
+NETWORK:
+*
+
+Version:
+<apex:outputText id="optxt1" value="{!url}"></apex:outputText>
+<apex:outputText id="optxt2" value="{!frameworkVersion}"></apex:outputText>
+<apex:outputText id="optxt3" value="{!lastChanged}"></apex:outputText>
+           
+
+
+</apex:page>

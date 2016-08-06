@@ -1,0 +1,466 @@
+<!-- * Created By: Dinesh and Poornima -TPT
+     * Project Name: M&E Implementation
+     * Created Date: (24-Dec-2015)
+     * Description:
+        1. Page to generate the forms based on the number of questions added to the results framework 
+           and also get the response for the questions.
+        2. Created scripts to store the form data in offline mode and also to store the form in browser cache.
+-->
+
+<apex:page id="pfPage" docType="html-5.0" standardStylesheets="false" manifest="/ManifestPage" controller="ResultFrameworkController" applyHtmlTag="true" sidebar="false" showheader="false">
+<apex:includeScript value="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js" />
+<apex:includeScript value="/soap/ajax/32.0/connection.js"/>
+<apex:includeScript value="/soap/ajax/32.0/apex.js"/>
+  
+<head>
+
+<style>
+body{
+        font-size: 74%;      
+        width:100%;
+        font-family:Verdana;
+}
+
+body,td{
+font-family: Verdana;
+vertical-align: top;
+}
+
+.bPageBlock .pbTitle {
+    width: 60%;
+}
+
+body .bPageBlock{
+    padding-left:10px;
+    
+}
+
+
+h1{color:#ad0075;font-size: 20px;}
+
+.tableContainer
+{
+    height:550px; 
+    width: 100%;
+    overflow: auto;  
+}
+
+.blockTable
+{
+    background-color:#ffffff;       
+    height:550px; 
+    width: 100%;
+    border-spacing:2px;
+} 
+
+.partnerTable
+{
+    background-color:#f2f3f3;       
+    height:100%; 
+    width: 100%;
+    border-spacing:2px;
+    display:block;
+} 
+
+.infoTable
+{
+    height:100%; 
+    width: 100%;
+    border-spacing:2px;
+    display:block;
+} 
+
+.tablecolumn
+{
+    background-color:#f2f3f3;
+}    
+
+.HeaderTable{
+    
+    width:100%;    
+    text-align: center;
+    text-decoration: none; 
+    padding: 5px 5px;  
+    font-size: 14px; 
+}
+
+.sectionHeader {
+    height:25px;
+    color:white;
+    text-align: center; 
+    color: white;
+    font-size: 12px;
+    cellspacing:2;
+    border-color:white;}
+
+.colDetails{font-size: 11px;
+    width:10%;}
+
+.submitButton
+{
+    background-color: #ad0075; 
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;    
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;   
+}
+.infoBar
+{
+    background-color: #ad0075; 
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;    
+    font-size: 14px;    
+    font-weight: bold;   
+}
+
+.message {
+    background-color: #ffc;
+    border-style: solid;
+    border-width: 1px;
+    color: #000;
+    padding: 6px 8px 6px 6px;
+    margin: 0 0 4px 0;
+    border-color: #390;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.appheadercon{
+    font-size:14px;
+    padding-top:5px;
+    padding-bottom:10px;
+}
+    
+</style>
+
+
+<script type="text/javascript">
+
+function myFunction() 
+{ 
+   <!--Check internet connection-->
+   
+     
+        if(typeof(localStorage) == 'undefined')    
+        {        
+            window.alert('Your browser does not support localStorage. Try upgrading.');
+            return;    
+        }     
+        else     
+        {
+                      
+        }       
+             
+}
+j$ = jQuery.noConflict();  
+j$(document).ready(function() {
+      var formQuestions=localStorage.getItem("{!pfID}_Questions");
+        var Questions=JSON.parse(formQuestions);
+        loadQuestions(Questions);
+  
+
+   });
+   
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function IsNumeric(e) {
+            var keyCode = e.which ? e.which : e.keyCode
+            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+            var str=e.target.id;           
+            var elementID="error"+str.substr(str.indexOf("txt")+3, str.length);            
+            document.getElementById(elementID).style.display = ret ? "none" : "inline";
+            return ret;
+        }
+
+ function loadQuestions(JSONString)
+ {     
+    var i=0;
+    for(var str in JSONString)
+    {     
+       if(JSONString[str].renderRQ1FreeText=="true")
+       {  
+           document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<label style=\"display: inline-block;vertical-align:top;\">"+JSONString[str].relatedQuestion+"</label>&nbsp;&nbsp;";           
+           if(JSONString[str].qType=="Number" || JSONString[str].qType=="Percentage")
+           {
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += " <input type='text' onkeypress='return IsNumeric(event);' style='height:10px;width:80px;font-family:Verdana;font-size:12px' id=txt"+JSONString[str].qid+">";
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<span id='error"+JSONString[str].qid+"' style='color: Red; display: none'> Please enter a number using only numerical keys 0-9</span>";
+           }
+           else
+           {       
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<br/><textarea style='height:70px;width:60%;resize:both;font-family:Verdana;font-size:12px' id=txt"+JSONString[str].qid+"></textarea>";
+           }
+           if(JSONString[str].helpTxt!=null){ 
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<br/><i><label title='test' style=\"display: inline-block;vertical-align:top;\">("+JSONString[str].helpTxt+")</label></i>";           
+           }
+       }
+       if(JSONString[str].renderRQ1Picklist=="true")
+       {
+           document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<label style='display:inline-block;vertical-align:top;'>"+JSONString[str].relatedQuestion+"</label>&nbsp;&nbsp;";
+
+           var element = document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion");         
+           var picklist = document.createElement("select");
+           picklist.setAttribute("id","sel"+JSONString[str].qid); 
+           picklist.setAttribute("style","font-family:Verdana;font-size:12px");  
+           element.appendChild(picklist);  
+           var emptyoption = document.createElement('option');
+           picklist.appendChild(emptyoption);             
+           if(JSONString[str].multiOptions !=null)
+           {
+               var options = document.createElement('option');               
+               var optionsString=JSONString[str].multiOptions;
+               var array= optionsString.split('\r\n');                   
+               for (var opt = 0; opt < array.length; opt++) 
+               {                     
+                    picklist.options[picklist.options.length] = new Option(array[opt],array[opt]);                                                       
+               }                        
+           }
+           if(JSONString[str].helpTxt!=null){ 
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<br/><i><label style=\"display: inline-block;vertical-align:top;\">("+JSONString[str].helpTxt+")</label></i>";
+           }
+       }
+       if(JSONString[str].allRelatedQuestions!=null)
+       {
+
+           var JSONSubString=JSONString[str].allRelatedQuestions;                
+           var j=0;                              
+           for(var substr in JSONSubString)
+           { 
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<label style=\"display: inline-block;vertical-align:top;\">"+JSONSubString[substr].relatedQuestion+"</label>&nbsp;&nbsp;";
+
+               if(JSONSubString[substr].rType=='Number' || JSONSubString[substr].rType=='Percentage')
+               {
+                   document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<input type='text' onkeypress='return IsNumeric(event);' style='height:10px;width:80px;font-family:Verdana;font-size:12px' id=rel"+j+"txt"+JSONString[str].qid+"><br/><br/>";
+                   document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<span id='error"+JSONString[str].qid+"' style='color: Red; display: none'> Please enter a number using only numerical keys 0-9</span>";
+               }
+               else{
+                   document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<br/><textarea style='height:70px;width:60%;resize:both;font-family:Verdana;font-size:12px' id=rel"+j+"txt"+JSONString[str].qid+"></textarea><br/><br/>";
+               }
+               j++;
+           }
+           if(JSONString[str].helpTxt!=null){ 
+               document.getElementById("pfPage:pfForm:pbQuesBlock:Pbtb2:"+i+":colQuestion").innerHTML += "<br/><i><label style=\"display: inline-block;vertical-align:top;\">("+JSONString[str].helpTxt+")</label></i>";         
+           }   
+       }
+                    
+       i++;  
+    }
+   
+    
+ }
+ 
+ function saveResponse(x)
+ {
+      var partnerDetail=document.getElementById("pfPage:pfForm:partnerPicklist");
+      var tmDetail=document.getElementById("pfPage:pfForm:TMPicklist");
+      var reportingDetail=document.getElementById("pfPage:pfForm:ReportingPicklist");   
+    
+      var partnerData=partnerDetail.value;
+      var tmData=tmDetail.value;
+      var reportingData=reportingDetail.value;       
+   
+      localStorage["{!pfID}_Partner"]=partnerData;
+      localStorage["{!pfID}_Volunteer"]=tmData;
+      localStorage["{!pfID}_ReportingFrequency"]=reportingData;     
+ 
+      var formQues=JSON.parse(localStorage.getItem("{!pfID}_Questions"));
+      for(var q in formQues)
+      {
+          if(formQues[q].renderRQ1FreeText=="true")
+          {
+              formQues[q].response=document.getElementById("txt"+formQues[q].qid).value;
+          }
+          if(formQues[q].renderRQ1Picklist=="true")
+          {
+              formQues[q].response=document.getElementById("sel"+formQues[q].qid).value;
+          }
+          if(formQues[q].allRelatedQuestions!=null)
+          {
+              var relQues=formQues[q].allRelatedQuestions;
+              var item=0;
+              for(var subq in relQues)
+               {
+                  relQues[subq].relatedResponse=document.getElementById("rel"+item+"txt"+formQues[q].qid).value;  
+                  item++;
+               }         
+          }
+      }
+      localStorage["{!pfID}_Responses"]=JSON.stringify(formQues);
+     
+      if((navigator.onLine)&&(x==1))
+       { 
+          var responsedata= localStorage.getItem("{!pfID}_Responses");         
+          submitData(responsedata);
+       }
+       else
+       {                       
+           document.getElementById("pfPage:pfForm:OfflineSave1").innerHTML="Your responses have been stored in your browser. You can now safely leave this page.<br/>To submit the completed form, revisit this page using the same browser and click 'Submit Form'";
+       }
+       
+ }
+ 
+ function populateForm()
+ {
+     var partnerValue=localStorage.getItem("{!pfID}_Partner");
+     var partnerElement=document.getElementById("pfPage:pfForm:partnerPicklist");    
+     if(partnerElement!=null){partnerElement.value=partnerValue;}
+    
+     var tmValue=localStorage.getItem("{!pfID}_Volunteer");
+     var tmElement=document.getElementById("pfPage:pfForm:TMPicklist");
+     if(tmElement!=null){tmElement.value=tmValue;}    
+    
+     var reportingValue=localStorage.getItem("{!pfID}_ReportingFrequency");
+     var reportingElement=document.getElementById("pfPage:pfForm:ReportingPicklist");
+     if(reportingElement!=null){reportingElement.value=reportingValue;}
+    
+ 
+     var formdata= localStorage.getItem("{!pfID}_Responses");
+     var data=JSON.parse(formdata);
+     if(data!=null)
+     {
+        for(var res in data)    
+        {
+           if(data[res].renderRQ1FreeText=="true")
+           {
+               var element1=document.getElementById("txt"+data[res].qid);
+               if(element1!=null){element1.value=data[res].response;}
+           }
+           if(data[res].renderRQ1Picklist=="true")
+           {
+               var element2=document.getElementById("sel"+data[res].qid);
+               if(element2!=null){element2.value=data[res].response;}
+           }
+           if(data[res].allRelatedQuestions!=null)
+           {
+               var relData=data[res].allRelatedQuestions;                
+               var count=0;                              
+               for(var rel in relData)
+               {
+                   var element3=document.getElementById("rel"+count+"txt"+data[res].qid);
+                   if(element3!=null){element3.value=relData[rel].relatedResponse;} 
+                   count++;
+               }
+           }   
+        }   
+     }       
+ }
+ 
+
+window.onload = function()
+{   
+     populateForm();
+}
+
+     
+</script>
+
+</head>
+
+<body>
+ <apex:form id="pfForm" > 
+    <apex:variable var="sr" value="{!0}"/> 
+         <table width="100%">
+             <tr>
+                 <td><apex:image url="{!$Resource.VSO_Logo}" width="60" height="50"/></td>
+                <td><h1 align="center">{!PFName}</h1></td>
+             </tr>
+         </table>
+           
+        <table cellspacing="10" width="100%">
+         <h3 class="infoBar">About this form</h3> 
+            <tr>
+              <td width="60%">  
+
+                   <!-- Picklist to display 'Volunteers/employee' linked to the 'Results Framework'-->
+                   <apex:outputPanel styleClass="infoTable">    
+                     <apex:outputText ><b>Your Name </b></apex:outputText>   
+                     <apex:selectList id="TMPicklist" size="1" value="{!volunteerName}" required="true">
+                       <apex:selectOptions value="{!teamMembers}" ></apex:selectOptions>
+                     </apex:selectList>            
+                   </apex:outputPanel>      
+     
+                   <!-- Picklist to display 'Partners' linked to the 'Results Framework'-->
+                  <apex:outputPanel styleClass="infoTable"> <br/>
+                    <apex:outputText ><b>Does the information you're providing relate to a specific partner? </b></apex:outputText>   
+                    <apex:selectList id="partnerPicklist" size="1" value="{!partner}">
+                        <apex:selectOptions value="{!partnerOptions}" ></apex:selectOptions>
+                    </apex:selectList> 
+                  </apex:outputPanel>   
+    
+                  <!-- Picklist to display Reporting Period -->   
+                  <apex:outputPanel styleClass="infoTable"> <br/>     
+                    <apex:outputText ><b>What period are you providing information for? </b></apex:outputText>   
+                    <apex:selectList id="ReportingPicklist" size="1" value="{!reportingPeriod}" required="true">
+                        <apex:selectOptions value="{!reportingOptions}" ></apex:selectOptions>
+                    </apex:selectList>            
+                  </apex:outputPanel>          
+              </td>  
+       
+              <td>
+               <apex:outputPanel styleClass="infoTable"><br/>
+                   <apex:outputLabel style="font-weight:bold" value="Country: "></apex:outputLabel> 
+                   <apex:outputText value="{!countryInfo}"/>
+               </apex:outputPanel>
+               <apex:outputPanel styleClass="infoTable"><br/>
+                   <apex:outputLabel style="font-weight:bold" value="VSO Project Name: "></apex:outputLabel>
+                   <apex:outputText value="{!projectInfo}"/>
+               </apex:outputPanel>
+               <apex:outputPanel styleClass="infoTable"><br/>
+                   <apex:outputLabel style="font-weight:bold" value="Reporting Frequency: "></apex:outputLabel>
+                   <apex:outputText value="{!frequencyInfo}"/>                  
+               </apex:outputPanel> 
+             </td>
+            </tr>
+        </table>  
+
+    <div style="width:100%;height:35px;border:1px solid #ad0075;background-color:#ad0075"> 
+   </div>
+      
+        <apex:pageBlock id="pbQuesBlock" >        
+       <!-- Table to display questions --> 
+       <apex:pageBlockTable id="Pbtb2" value="{!allQuestions}" var="qPreview" styleClass="blockTable" columnClasses="tablecolumn" columns="2" columnsWidth="2%,48%">    
+            
+           <apex:outputLabel > </apex:outputLabel>/>
+              <apex:column style="text-align: center;">
+                 <apex:variable var="sr" value="{!sr+1}"/>
+                         {!sr}.                
+              </apex:column>     
+                 
+                <!-- Questions/Indicators Column -->
+                <apex:column id="colQuestion">             
+                </apex:column>             
+                
+       </apex:pageBlockTable>
+       <apex:outputPanel id="showmsg">
+         
+         <apex:pageMessages id="pagemsg"></apex:pageMessages> 
+       </apex:outputPanel> 
+      </apex:pageBlock>  
+      <br/>
+     <div align="right"> 
+     
+    <apex:commandButton id="cmdSave"  onclick="saveResponse(0);return false;" value="SAVE" title="Your responses will be stored in your browser and can be submitted later" styleClass="submitButton"/>   
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <apex:commandButton id="cmdSubmit" onclick="saveResponse(1);return false;" value="SUBMIT FORM" title="Where internet connection is available, the question responses will be submitted immediately. Otherwise, responses will be stored in your browser and can be submitted later by reloading the form and clicking this button again" reRender="showmsg" styleClass="submitButton"/>
+      </div>  
+    <apex:outputText id="OfflineSave1" style="color:#ad0075;font-size: 13px;font-weight: bold;" ></apex:outputText> 
+    <apex:actionFunction action="{!submitResults}" name="submitData" reRender="showmsg">
+    <apex:param name="myParam" value=""/>
+    </apex:actionFunction>    
+   
+    <apex:outputText >
+  <h2>Offline Access</h2>
+  <i>You can work on this form without an internet connection and save your progress using the “Save” button.<br/> 
+  Once a connection is available, you will need to revisit this page and click “Submit Form”. It may be helpful to bookmark 
+  this page in your browser</i>
+  </apex:outputText>
+  </apex:form>  
+ </body>
+
+</apex:page>

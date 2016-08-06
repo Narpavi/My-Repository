@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <content>DsEditTemplate</content>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Visualforce</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <content>DsViewTemplate</content>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Visualforce</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableEnhancedLookup>true</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Description__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Description</label>
+        <length>2000</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>EmailMessage__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Email Message</label>
+        <length>2000</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>5</visibleLines>
+    </fields>
+    <fields>
+        <fullName>EmailSubject__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Email Subject</label>
+        <length>100</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>EnvelopeLookUpField__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The Developer Name (API Name) of the field on the DocuSign Envelopes object that relates to the returned document from DocuSign.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The Developer Name (API Name) of the field on the DocuSign Envelopes object that relates to the returned document from DocuSign.</inlineHelpText>
+        <label>Envelope Look Up Field</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ParentObjectAPIName__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The Developer Name (API Name) of the object that will be used as a source for the recipients&apos; email &amp; Full Name.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The Developer Name (API Name) of the object that will be used as a source for the recipients&apos; email &amp; Full Name.</inlineHelpText>
+        <label>Send from Object</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ReturnObjectAPIName__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The Developer Name (API Name) of the object that Document status and signed PDFs will be associated to.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The Developer Name (API Name) of the object that Document status and signed PDFs will be associated to.</inlineHelpText>
+        <label>Return to Object</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ReturnObjectId__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Return to Object Id</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>RoleCount__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>RoleCount</label>
+        <summaryFilterItems>
+            <field>RecipientRole__c.RecipientEmailAddress__c</field>
+            <operation>equals</operation>
+            <value>&apos;&apos;</value>
+        </summaryFilterItems>
+        <summaryForeignKey>RecipientRole__c.DocuSignTemplate__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackTrending>false</trackTrending>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Status__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Template Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Active</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Inactive</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Active Self serve</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>TemplateName__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Template Name</label>
+        <length>100</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Template_ID__c</fullName>
+        <caseSensitive>false</caseSensitive>
+        <deprecated>false</deprecated>
+        <externalId>true</externalId>
+        <label>Template ID</label>
+        <length>40</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>true</unique>
+    </fields>
+    <fields>
+        <fullName>View__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&quot;/&quot;+ Id ,  Template_ID__c  , &quot;_top&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Template</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>DocuSign Template</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>View__c</columns>
+        <columns>TemplateName__c</columns>
+        <columns>Status__c</columns>
+        <columns>ParentObjectAPIName__c</columns>
+        <columns>ReturnObjectAPIName__c</columns>
+        <columns>LAST_UPDATE</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+        <language>en_US</language>
+    </listViews>
+    <nameField>
+        <displayFormat>Tmpl-{00000000}</displayFormat>
+        <label>DocuSign Template Id</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>DocuSign Templates</pluralLabel>
+    <searchLayouts>
+        <customTabListAdditionalFields>View__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>TemplateName__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Status__c</customTabListAdditionalFields>
+        <excludedStandardButtons>New</excludedStandardButtons>
+        <excludedStandardButtons>Accept</excludedStandardButtons>
+        <excludedStandardButtons>ChangeOwner</excludedStandardButtons>
+        <listViewButtons>UpdateTemplateList</listViewButtons>
+        <lookupDialogsAdditionalFields>TemplateName__c</lookupDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>View__c</lookupPhoneDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>TemplateName__c</lookupPhoneDialogsAdditionalFields>
+        <searchResultsAdditionalFields>View__c</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>TemplateName__c</searchResultsAdditionalFields>
+    </searchLayouts>
+    <sharingModel>ReadWrite</sharingModel>
+    <webLinks>
+        <fullName>UpdateTemplate</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Update Template</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/35.0/connection.js&quot;)} 
+{!REQUIRESCRIPT(&quot;/soap/ajax/35.0/apex.js&quot;)}
+
+if(&apos;{!DocuSignTemplate__c.Template_ID__c}&apos;!= null) {
+    var r = confirm(&apos;{!$Label.fhcm2__DocuSign_Update_Confirm}&apos;);
+    if (r == true) {
+        var templateID=&apos;{!DocuSignTemplate__c.Template_ID__c}&apos;;
+        var status = sforce.apex.execute(&quot;fHCM2.DsServices&quot;,&quot;updateTemplateFromDocuSign&quot;,{templateID: templateID});
+        if (status != &apos;OK&apos;) {
+            alert(status);
+        }
+        urlStr = &apos;{!URLFOR(&apos;/apex/fHCM2__DsViewTemplate&apos;)}&apos;;
+        location.replace(urlStr+&apos;?id={!DocuSignTemplate__c.Id}&apos;);
+    }
+}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>UpdateTemplateList</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Update Template List</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>false</requireRowSelection>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/35.0/connection.js&quot;)} 
+{!REQUIRESCRIPT(&quot;/soap/ajax/35.0/apex.js&quot;)}
+
+if(&apos;{!DocuSignTemplate__c.Template_ID__c}&apos;!= null) {
+    var r = confirm(&apos;{!$Label.fhcm2__DocuSign_Update_Confirm}&apos;);
+    if (r == true) {
+        var status = sforce.apex.execute(&quot;fHCM2.DsServices&quot;,&quot;updateTemplateListFromDocuSign&quot;,{});
+        if (status != &apos;OK&apos;) {
+            alert(status);
+        }
+        location.reload();
+    }
+}</url>
+    </webLinks>
+</CustomObject>

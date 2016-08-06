@@ -1,0 +1,4 @@
+<apex:page standardcontroller="fHCM2__DocuSignTemplate__c" >
+    <apex:pagemessages />
+    <apex:detail subject="{!fHCM2__DocuSignTemplate__c.Id}" />
+</apex:page>

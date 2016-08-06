@@ -1,0 +1,30 @@
+<apex:page standardController="fRecruit__BroadbeanUsers__c" extensions="fRecruit.BroadbeanUserControllerExtension">
+    <apex:sectionHeader title="Configure" subTitle="Fairsail Recruit" help="http://helprecruit.fairsail.com" />
+    <apex:form >
+        <apex:pageBlock title="Broadbean User Configuration" mode="edit">
+        
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="Save" />
+                <apex:commandButton action="{!cancel}" value="Cancel" />
+                <apex:commandButton action="{!deleteBroadbeanUser}" value="Delete" rendered="{!showDelete}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection columns="1">
+                
+                <apex:inputHidden value="{!fRecruit__BroadbeanUsers__c.Name}" id="name"/>
+                <apex:inputField value="{!fRecruit__BroadbeanUsers__c.SetupOwnerId}" id="ownerId" label="Fairsail User"/>
+                
+                <apex:inputField value="{!fRecruit__BroadbeanUsers__c.fRecruit__User_Name__c}" id="bbUserName" label="Broadbean User"/>
+                <!-- <apex:inputField value="{!fRecruit__BroadbeanUsers__c.fRecruit__Password__c}" id="bbPassword"/> -->
+                <apex:inputSecret value="{!fRecruit__BroadbeanUsers__c.fRecruit__Password__c}" id="bbPassword" redisplay="true"/>
+                <apex:inputCheckbox value="{!fRecruit__BroadbeanUsers__c.fRecruit__Use_Field_Merge__c}" id="bbFieldMerge"/>
+                
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+    </apex:form>
+    <!--
+	{!fRecruit__BroadbeanUsers__c.Name}<br/>
+	{!fRecruit__BroadbeanUsers__c.SetupOwnerId}
+	-->
+</apex:page>

@@ -1,0 +1,35 @@
+<apex:page controller="fHCM2.DsSendFormController" tabstyle="fHCM2__DocuSignTemplate__c">
+    <apex:sectionheader title="{!$Label.fhcm2__DocuSign}" subtitle="{!$Label.fhcm2__DocuSign_Templates}" />
+    <apex:messages />
+    <apex:pagemessages id="showmsg"></apex:pagemessages>
+        <!--{!primaryObjectID}-->
+        <apex:form >
+            <apex:pageblock title="{!$Label.fhcm2__DocuSign_Templates}">
+                <apex:pageblockbuttons location="bottom">
+                    <apex:commandbutton value="{!$Label.fhcm2__Button_Cancel}" action="{!back}">
+                    </apex:commandbutton>
+                </apex:pageblockbuttons>
+                <apex:pageblocksection columns="1">
+                    <apex:pageblocktable value="{!dsTemplates}" var="dsTmp">
+                        <apex:column headervalue="">
+                            <apex:commandbutton value="{!$Label.fhcm2__DocuSign_Send}" action="{!send}" rerender="all,showmsg" status="status">
+                                <apex:param name="tpID" value="{!dsTmp.fHCM2__Template_ID__c}" assignto="{!tplID}" />
+                            </apex:commandbutton>
+                            <apex:actionstatus id="status">
+                                <apex:facet name="start">&nbsp;<img src="/img/loading.gif" /></apex:facet>
+                            </apex:actionstatus>
+                        </apex:column>
+                        <apex:column headervalue="Template Name">
+                            <apex:outputtext value="{!dsTmp.fHCM2__TemplateName__c}" />
+                        </apex:column>
+                        <apex:column headervalue="Email Subject">
+                            <apex:outputtext value="{!dsTmp.fHCM2__EmailSubject__c}" />
+                        </apex:column>
+                        <apex:column headervalue="Description">
+                            <apex:outputtext value="{!dsTmp.fHCM2__Description__c}" />
+                        </apex:column>
+                    </apex:pageblocktable>
+                </apex:pageblocksection>
+            </apex:pageblock>
+        </apex:form>
+</apex:page>

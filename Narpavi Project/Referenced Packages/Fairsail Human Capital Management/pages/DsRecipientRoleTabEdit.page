@@ -1,0 +1,57 @@
+<apex:page standardcontroller="fHCM2__RecipientRoleTab__c" extensions="fHCM2.DsRecipientRoleTabEditController" tabstyle="fHCM2__DocuSignTemplate__c">
+    <apex:sectionheader title="{!$ObjectType.fHCM2__RecipientRoleTab__c.label}" subtitle="{!fHCM2__RecipientRoleTab__c.Name}" />
+    <apex:messages />
+    <apex:pagemessages id="showmsg"></apex:pagemessages>
+    <apex:form >
+        <apex:actionfunction action="{!toggleWriteIn}" name="toggleWriteIn" immediate="true" rerender="editSectionTo,editSectionFrom"></apex:actionfunction>
+        <apex:pageblock title="">
+            <apex:pageblockbuttons >
+                <apex:commandbutton value="{!$Label.fhcm2__Button_Save}" action="{!save}"></apex:commandbutton>
+                <apex:commandbutton value="{!$Label.fhcm2__Button_Cancel}" action="{!cancel}"></apex:commandbutton>
+            </apex:pageblockbuttons>
+            <apex:pageblocksection columns="1" title="{!$Label.fhcm2__Global_Information}" collapsible="false">
+                <apex:outputfield value="{!fHCM2__RecipientRoleTab__c.fHCM2__TabLabel__c}" />
+                <apex:outputfield value="{!fHCM2__RecipientRoleTab__c.fHCM2__TabName__c}" />
+                <apex:outputfield value="{!fHCM2__RecipientRoleTab__c.fHCM2__TabType__c}" />
+                <apex:outputfield value="{!fHCM2__RecipientRoleTab__c.RecipientRole__r.DocuSignTemplate__r.fHCM2__ParentObjectAPIName__c}" />
+                <apex:outputfield value="{!fHCM2__RecipientRoleTab__c.RecipientRole__r.DocuSignTemplate__r.fHCM2__ReturnObjectAPIName__c}" />
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" title="{!$Label.fhcm2__Global_Details}" collapsible="false" showheader="true" id="editSection">
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="Advanced rule" />
+                    <apex:inputcheckbox value="{!writeIn}" immediate="true" onclick="toggleWriteIn();" />
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" collapsible="false" showheader="false" id="editSectionFrom" rendered="{!showFrom}">
+                <apex:pageblocksectionitem rendered="{!!writeIn}">
+                    <apex:outputlabel value="{!$ObjectType.fHCM2__RecipientRoleTab__c.Fields.fHCM2__ParentObjectField__c.label}" />
+                    <apex:selectlist value="{!fHCM2__RecipientRoleTab__c.fHCM2__ParentObjectField__c}" id="ParentObjectField" size="1" style="width:250px">
+                        <apex:selectoptions value="{!FromObjectFields}" />
+                    </apex:selectlist>
+                </apex:pageblocksectionitem>
+                <apex:inputfield value="{!fHCM2__RecipientRoleTab__c.fHCM2__ParentObjectField__c}" id="ParentObjectField" style="width:250px" rendered="{!writeIn}" />
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" collapsible="false" showheader="false" rendered="{!!showFrom}">
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$ObjectType.fHCM2__RecipientRoleTab__c.Fields.fHCM2__ParentObjectField__c.label}" />
+                    <apex:outputlabel value="{!$Label.fhcm2__DocuSign_Unsupported_Field_Type}" />
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" collapsible="false" showheader="false" id="editSectionTo" rendered="{!showTo}">
+                <apex:pageblocksectionitem rendered="{!!writeIn}">
+                    <apex:outputlabel value="{!$ObjectType.fHCM2__RecipientRoleTab__c.Fields.fHCM2__ReturnObjectField__c.label}" />
+                    <apex:selectlist value="{!fHCM2__RecipientRoleTab__c.fHCM2__ReturnObjectField__c}" id="ReturnObjectField" size="1" style="width:250px">
+                        <apex:selectoptions value="{!ReturnObjectFields}" />
+                    </apex:selectlist>
+                </apex:pageblocksectionitem>
+                <apex:inputfield value="{!fHCM2__RecipientRoleTab__c.fHCM2__ReturnObjectField__c}" id="ReturnObjectField" style="width:250px" rendered="{!writeIn}" />
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" collapsible="false" showheader="false" rendered="{!!showTo}">
+                <apex:pageblocksectionitem >
+                    <apex:outputlabel value="{!$ObjectType.fHCM2__RecipientRoleTab__c.Fields.fHCM2__ReturnObjectField__c.label}" />
+                    <apex:outputlabel value="{!$Label.fhcm2__DocuSign_Unsupported_Field_Type}" />
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

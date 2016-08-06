@@ -1,0 +1,584 @@
+<apex:page controller="fHCM2.SalaryPlanningTeamController" standardstylesheets="true" showheader="{!viewer.showSalesforceBanner}" sidebar="false" title="Team Member Profile" rendered="{!managerPolicy.fHCM2__Salary_Plan_Is_Active__c==true && (managerPolicy.fHCM2__Salary_Plan_Manager__c || managerPolicy.fHCM2__Bonus_Plan_Manager__c) && (viewer.isTeamMember || viewer.isHigherManager || viewer.isHR)}">
+  <script  type='text/javascript'>
+	window.onload = function (){
+				 parent.postMessage('ResizeHeight-'+document.getElementById('salaryPlanTeamContainer').offsetHeight,"*");
+	}
+   				
+</script>  
+<div id="salaryPlanTeamContainer">
+    <apex:composition template="fHCM2__FairsailTemplateOptionalFooter">
+        <apex:define name="styleExtra">
+                <style>
+                    <apex:outputText value="{!viewer.departmentPolicy.fHCM2__Style__c}" / >
+                </style>
+            <style>
+            	.pbBody td.subBlockLabel {
+				    padding-bottom: 1px;
+				    padding-top: 1px;
+				    border-bottom-width: 0;
+				    color: #4A4A56;
+                        font-size: 85%;
+    				font-weight: bold;
+    				text-align: right;
+    				vertical-align: top;
+    				padding-right: 10px;
+				    width:67%;
+                }
+                    .bEditBlock input {
+                        padding: 2px 2px;
+                        line-height: 10px;
+                        font-size: 95%;
+                    }
+                     .pbBody td.subBlockData {
+                        font-size: 85%;
+				    padding-bottom: 1px;
+				    padding-top: 1px;
+				    border-bottom-width: 0;
+				    text-align: left;
+				    vertical-align: top;
+				    color: #000000;
+				    width:33%;
+                }
+            
+                    .pbBody td.statusData {
+                        font-size: 85%;
+                        padding-bottom: 1px;
+                        padding-top: 1px;
+                        border-bottom-width: 0;
+                        text-align: left;
+                        vertical-align: top;
+                        color: #000000;
+                       
+                    }
+
+                    .rationale {
+                        height: 35px;
+                        }
+
+                    .block-manager-section {
+                        float: left;
+                        width: 50%;
+                    }
+
+                    .summary {
+                        padding: 0px;
+                        font-family: Arial,Helvetica,sans-serif;
+                        color: #4A4A56;
+                        font-size: 91%;
+                        font-weight: bold;
+                    }
+
+                    .bPageBlock .labelCol {
+                        width: 33%;
+                       
+                    }
+   
+                  
+                </style>
+                <apex:includescript value="{!URLFOR($Resource.fHCM2__jqueryUI, '/js/jquery-1.8.3.min.js')}" />
+                <apex:includescript value="{!URLFOR($Resource.fHCM2__jqueryUI, '/js/autoresize.jquery.js')}" />
+		    <script type="text/javascript">
+		        jQuery.noConflict();
+				jQuery(document).ready(function(){
+					jQuery('.autoResize').autoResize({}).trigger('change');
+			        if ({!viewer.WXIsActive}){
+			        	jQuery(".thinPanelTD").hide();
+			        }
+					Recalc();
+                    bonusCalculation();
+
+				});
+				var decimalPlace = "{!decimalPlace}";
+				var thousandsSeperator = "{!thousandsSeperator}";
+		        var salary = new Array();
+                <apex:repeat value="{!activeReports}" var="person">
+                	salary["{!person.id}"] = new Object();
+                    salary["{!person.id}"].suggestedPercentage = {!blankvalue(compensationPlans[person.id].employment.suggestedSalaryPercentage,0)};
+                    salary["{!person.id}"].annualCurrentReporting = {!blankvalue(compensationPlans[person.id].employment.annualCurrentReporting,0)};
+                    salary["{!person.id}"].approved = {!compensationPlans[person.id].salaryItem.approved};
+                    salary["{!person.id}"].bandLowPercentage = {!blankvalue(compensationPlans[person.id].employment.bandLowPercentage,0)};
+                    salary["{!person.id}"].bandHighPercentage= {!blankvalue(compensationPlans[person.id].employment.bandHighPercentage,0)};
+
+                    salary["{!person.id}"].suggestedPercentageBonus = {!blankvalue(compensationPlans[person.id].employment.suggestedBonusPercentage,0)};
+                    salary["{!person.id}"].rate= {!blankvalue(compensationPlans[person.id].employment.rate,0)};
+                    salary["{!person.id}"].approvedBonus = {!compensationPlans[person.id].bonusItem.approved};
+                    salary["{!person.id}"].currentSalary = {!compensationPlans[person.id].employment.currentSalary};
+                    salary["{!person.id}"].hasSalary = {!tmPermissionsList[person.id].salaryPlan};
+                    salary["{!person.id}"].hasBonus = {!tmPermissionsList[person.id].bonusPlan};
+                    salary["{!person.id}"].suggestedBonus = {!blankvalue(compensationPlans[person.id].employment.suggestedBonus,0)};;
+                </apex:repeat>
+                String.prototype.replaceAll = function(s, r) {
+                	var res = this;
+                	while (res!=null && s!=r && res.indexOf(s)>0) res = res.replace(s,r);
+                	return res;
+                }
+                String.prototype.numberValue = function(d, t){
+                	var s = this==null ? '' : this.trim().replaceAll(t,'').replace(d,'.');
+                	return s == '' ? 0 : Number(s);
+                }
+                Number.prototype.formatMoney = function(c, d, t){
+					var n = this, c = isNaN(c = Math.abs(c)) ? 2 : c, d = d == undefined ? "," : d, t = t == undefined ? "." : t, s = n < 0 ? "-" : "", i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "", j = (j = i.length) > 3 ? j % 3 : 0;
+					   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+ 				};
+                function Recalc() {
+                	var totalAnnualReporting = 0.0;
+                	var totalSuggestedAnnualReporting = 0.0;
+                	var totalProposedAnnualReporting = 0.0;
+                	for(personid in salary) {
+                        if( salary[personid].hasSalary){
+                            totalAnnualReporting += salary[personid].annualCurrentReporting;
+                            totalSuggestedAnnualReporting += salary[personid].annualCurrentReporting + (salary[personid].annualCurrentReporting*salary[personid].suggestedPercentage/100);
+
+                            var recommendedPercentageString = jQuery('#'+personid+' .salaryPercent').val();
+                            var color = '';
+                            if (recommendedPercentageString!=null && recommendedPercentageString!='') {
+                                if ((salary[personid].bandHighPercentage >0 && salary[personid].bandLowPercentage<=recommendedPercentageString.numberValue(decimalPlace, thousandsSeperator) && salary[personid].suggestedPercentage>=recommendedPercentageString.numberValue(decimalPlace, thousandsSeperator)) ||
+                                    salary[personid].suggestedPercentage == recommendedPercentageString.numberValue(decimalPlace, thousandsSeperator)){
+                                    color = '#66CC00';
+                                }else if (salary[personid].suggestedPercentage<recommendedPercentageString.numberValue(decimalPlace, thousandsSeperator)){
+                                    color = '#FF9999';
+                                }
+	                		totalProposedAnnualReporting += salary[personid].annualCurrentReporting + (salary[personid].annualCurrentReporting*recommendedPercentageString.numberValue(decimalPlace, thousandsSeperator)/100);
+                		} else {
+                 			if (salary[personid].suggestedPercentage>0) color = '';
+                			totalProposedAnnualReporting += salary[personid].annualCurrentReporting;
+                		}
+
+                            if (salary[personid].approved) {
+                                jQuery('#'+personid+' .salaryPercent').attr("disabled",true);
+                                jQuery('#'+personid+' .salaryAmount').attr("disabled",true);
+                            }
+
+                            jQuery('#'+personid+' .salaryPercent, #'+personid+' .salaryAmount').css('background-color',color);
+                        }
+                    }
+                    if(totalAnnualReporting > 0){
+                        jQuery('#totalAnnualReporting').html(totalAnnualReporting.formatMoney(2, decimalPlace, thousandsSeperator));
+                        jQuery('#totalSuggestedIncreaseReporting').html((totalSuggestedAnnualReporting-totalAnnualReporting).formatMoney(2, decimalPlace, thousandsSeperator)+' or '+String(Math.round((totalSuggestedAnnualReporting-totalAnnualReporting)*10000/totalAnnualReporting)/100).replace('.',decimalPlace)+'%');
+                        jQuery('#totalProposedIncreaseReporting').html((totalProposedAnnualReporting-totalAnnualReporting).formatMoney(2, decimalPlace, thousandsSeperator)+' or '+String(Math.round((totalProposedAnnualReporting-totalAnnualReporting)*10000/totalAnnualReporting)/100).replace('.',decimalPlace)+'%');
+                        var color = '#66CC00';
+                        if (totalSuggestedAnnualReporting>totalProposedAnnualReporting) color = '';
+                        else if (totalSuggestedAnnualReporting<totalProposedAnnualReporting) color = '#FF9999';
+                        jQuery('#totalProposedIncreaseReporting').css('background-color',color);
+                    }
+
+                }
+
+                function calculateBonusValue(percentage, personId){
+                   if (percentage > 0){
+                          jQuery('#'+personId+'-bonus .bonusAmount').val( (Math.round( salary[personId].currentSalary/100 * percentage * 100 ) / 100).formatMoney(2, decimalPlace, thousandsSeperator));
+
+                    }else{
+                          jQuery('#'+personId+'-bonus .bonusAmount').val('');
+                    }
+
+                    bonusCalculation();
+                }
+
+                function calculateBonusPercentage(bonus, personId){
+                   if (bonus > 0){
+                       jQuery('#'+personId+'-bonus .bonusPercent').val((bonus*100/salary[personId].currentSalary).toFixed(2));
+                    }else{
+                        jQuery('#'+personId+'-bonus .bonusPercent').val('');
+                    }
+
+                    bonusCalculation();
+                }
+
+
+                function bonusCalculation() {
+                    var totalAnnualReporting = 0.0;
+
+                    var totalSuggestedBonus = 0.0;
+                    var totalProposedBonus = 0.0;
+
+                    for(personid in salary) {
+                        if (salary[personid].hasBonus){
+                            totalAnnualReporting += salary[personid].annualCurrentReporting;
+                            totalSuggestedBonus += salary[personid].suggestedBonus * salary[personid].rate;
+
+                            var recommendedPercentageBonus = jQuery('#'+personid+'-bonus .bonusPercent').val();
+                            var bonusAmount = jQuery('#'+personid+'-bonus .bonusAmount').val();
+                            if (bonusAmount !== undefined){
+                                totalProposedBonus += bonusAmount.numberValue(decimalPlace, thousandsSeperator) * salary[personid].rate;
+                            }
+                            var color = '#66CC00';
+
+                            //If any value from the bonus percentage
+                            if (recommendedPercentageBonus !== null && recommendedPercentageBonus !== '' && recommendedPercentageBonus > 0) {
+
+                                  //If suggested percentage bigger than recommended
+                                  if (salary[personid].suggestedPercentageBonus > recommendedPercentageBonus.numberValue(decimalPlace, thousandsSeperator)){
+                                     color = '';
+                                  }else if(salary[personid].suggestedPercentageBonus < recommendedPercentageBonus.numberValue(decimalPlace, thousandsSeperator)){
+                                     color = '#FF9999';
+                                  }
+                            }else{
+                                if (salary[personid].suggestedPercentageBonus > 0) color = '';
+                            }
+
+                            jQuery('#'+personid+'-bonus .bonusPercent, #'+personid+'-bonus .bonusAmount').css('background-color',color);
+                        }
+
+                    }
+
+                    if(totalSuggestedBonus > 0){
+                        jQuery('#totalSuggestedBonus').html(totalSuggestedBonus.formatMoney(2, decimalPlace, thousandsSeperator));
+                     //   jQuery('#totalProposedBonus').html(totalProposedBonus.formatMoney(2, decimalPlace, thousandsSeperator) +' or '+String((Math.round((totalProposedBonus)*100)/totalAnnualReporting).toFixed(2)).replace('.',decimalPlace)+'%');
+                       jQuery('#totalProposedBonus').html(totalProposedBonus.formatMoney(2, decimalPlace, thousandsSeperator));
+
+                        //Add color to proposed increase bonus
+                        var color = '#66CC00';
+                        if (totalSuggestedBonus>totalProposedBonus) {
+                            color = '';
+                        }else if(totalSuggestedBonus<totalProposedBonus){
+                            color = '#FF9999';
+                        }
+
+                        jQuery('#totalProposedBonus').css('background-color',color);
+                    }
+                }
+
+		    </script>
+        </apex:define>
+        <apex:define name="bannerPanel">
+            <c:fairsailBanner viewer="{!viewer}" links="{!links}"/>
+        </apex:define>
+
+        <apex:define name="thinPanel">
+                <c:TeamNavigationPanel viewer="{!viewer}" links="{!links}" page="{!links.SalaryPlanTeam}" title="{!$Label.fhcm2__Process_Salary_Plan}" noticepage="SalaryPlanTeam" />
+         </apex:define>
+
+        <apex:define name="widePanel">
+            <apex:form >
+                    <apex:pageblock title="{!viewer.teamMember.name}" mode="edit">
+                        <apex:outputpanel layout="block" styleclass="wideButtonBar" style="width:auto !important">
+                            <apex:outputlink value="/apex/{!links.SalaryPlan}" target="{!if(viewer.WXIsActive,'_self','_top')}">{!$Label.fhcm2__Button_Team}</apex:outputlink>
+                        </apex:outputpanel>
+                	<c:Notice viewer="{!viewer}" page="SalaryPlanTeam" location="Header"/>
+                        <apex:pagemessages />
+                        <apex:pageblocksection title="{!$Label.fhcm2__Process_Salary_Plan}" columns="1">
+                            <apex:pageblock >
+                        <c:PersonSection page="{!links.FairsailProfile}" name="{!viewer.teamMember.name}" value="{!viewer.teamMember.id}" picture="{!viewer.teamMember.pictureUrl}">
+                                    <table class="detailList">
+                                        <tr>
+                                            <td>
+                                                <div class="block-manager-section">
+                                                    <apex:pageblocksection >
+                                                        <apex:outputpanel styleclass="summary">{!$Label.fhcm2__Global_Reporting_Currency}</apex:outputpanel>
+                                                        <apex:outputpanel styleclass="data2Col">{!reportingCurrency}</apex:outputpanel>
+                                                    </apex:pageblocksection>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <!-- Manager: Salary Information -->
+                                                <div class="block-manager-section">
+                                                    <apex:pageblocksection rendered="{!managerPolicy.fHCM2__Salary_Plan_Manager__c && showSalarySummary}">
+                                                        <apex:outputpanel styleclass="summary">{!$Label.fhcm2__Process_Compensation_Plan_Current_Salary_Total}</apex:outputpanel>
+                                                        <apex:outputpanel styleclass="data2Col"><span id="totalAnnualReporting"></span></apex:outputpanel>
+                                                        <apex:outputpanel styleclass="summary">{!$Label.fhcm2__Process_Compensation_Plan_Suggested_Team_Salary_Increase}</apex:outputpanel>
+                                                        <apex:outputpanel styleclass="data2Col"><span id="totalSuggestedIncreaseReporting"></span></apex:outputpanel>
+                                                        <apex:outputpanel styleclass="summary">{!$Label.fhcm2__Process_Compensation_Plan_Proposed_Team_Salary_Increase}</apex:outputpanel>
+                                                        <apex:outputpanel styleclass="data2Col"><span id="totalProposedIncreaseReporting"></span></apex:outputpanel>
+                                                    </apex:pageblocksection>
+                                                </div>
+                                                <!-- Manager: End Salary Information-->
+                                                <!-- Manager: Bonus Information -->
+                                                <div class="block-manager-section">
+                                                    <apex:pageblocksection rendered="{!managerPolicy.fHCM2__Bonus_Plan_Manager__c && showBonusSummary}">
+                                                        <apex:outputpanel styleclass="summary">{!$Label.fhcm2__Bonus_Plan_Suggested_Team}</apex:outputpanel>
+                                                        <apex:outputpanel styleclass="data2Col"><span id="totalSuggestedBonus"></span></apex:outputpanel>
+                                                        <apex:outputpanel styleclass="summary">{!$Label.fhcm2__Bonus_Plan_Proposed_Team}</apex:outputpanel>
+                                                        <apex:outputpanel styleclass="data2Col"><span id="totalProposedBonus"></span></apex:outputpanel>
+                                                    </apex:pageblocksection>
+                                                </div>
+                                                <!-- Manager: End Bonus Information-->
+                                            </td>
+                                        </tr>
+                                    </table>
+                        </c:PersonSection>
+                            </apex:pageblock>
+                        </apex:pageblocksection>
+                        <apex:pageblocksection title="{!$Label.fhcm2__Global_Direct_Reports}" columns="1">
+                    <apex:repeat value="{!activeReports}" var="person">
+                                <c:PersonSection page="{!links.FairsailProfile}" name="->{!person.name}" value="{!person.id}" picture="{!person.pictureUrl}" rendered="{!(tmPermissionsList[person.id].salaryPlan && managerPolicy.fHCM2__Salary_Plan_Manager__c) || (tmPermissionsList[person.id].bonusPlan && managerPolicy.fHCM2__Bonus_Plan_Manager__c)}">
+                                    <apex:outputpanel rendered="{!tmPermissionsList[person.id].salaryPlan && managerPolicy.fHCM2__Salary_Plan_Manager__c}">
+                                        <div class="pbSubheader brandTertiaryBgr tertiaryPalette">
+                                            <h4>{!$Label.Process_Compensation_Planning_Salary_Planning}</h4>
+                                        </div>
+                                        <table style="width: 98%;">
+                                            <tr>
+	                        	<td  style="width:50%;vertical-align: top;">
+                                                    <table class="detailList" style="width:100%">
+                                                        <apex:repeat value="{!tableSalary.columns}" var="f">
+		                        		<tr>
+                                                                <td class="subBlockLabel"><apex:outputlabel value="{!f.name}" /></td>
+                                                                <td class="subBlockData"><apex:outputtext value="{!compensationPlans[person.id].attributes[f.name]}" /></td>
+		                            	</tr>
+									</apex:repeat>
+	                            </table>
+	                            </td>
+	                        	<td style="width:50%;vertical-align: top;">
+	                        	<table class="detailList" style="width:100%;">
+	                        		<tr>
+										<td class="subBlockLabel">
+											{!$Label.Process_Salary_Plan_Current}
+										</td>
+										<td class="subBlockData">
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.currentSalaryString}" />
+										</td>
+	                            	</tr>
+	                        		<tr>
+										<td class="subBlockLabel">
+											{!$Label.Process_Salary_Plan_Suggested}
+										</td>
+										<td class="subBlockData">
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.suggestedSalaryString}" />
+											&nbsp;or&nbsp;
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.suggestedSalaryPercentageString}" />% increase
+										</td>
+	                            	</tr>
+	                        		<tr>
+										<td class="subBlockLabel">
+											{!$Label.Process_Salary_Plan_Proposed}
+										</td>
+										<td class="subBlockData" id="{!person.id}">
+                                                                <apex:inputtext value="{!compensationPlans[person.id].salaryItem.SalaryAmount}" styleclass="salaryAmount" style="width:150px" onkeyup="if (this.value==null || this.value=='') jQuery('#{!person.id} .salaryPercent').val(''); else jQuery('#{!person.id} .salaryPercent').val(String(Math.round((this.value.numberValue(decimalPlace, thousandsSeperator)-{!compensationPlans[person.id].employment.currentSalary})/{!compensationPlans[person.id].employment.currentSalary}*10000)/100).replaceAll('.',decimalPlace));Recalc();" />
+											&nbsp;or&nbsp;
+                                                                <apex:inputtext value="{!compensationPlans[person.id].salaryItem.SalaryPercent}" styleclass="salaryPercent" style="width:50px;" onkeyup="if (this.value==null || this.value==''|| this.value==0) jQuery('#{!person.id} .salaryAmount').val(''); else jQuery('#{!person.id} .salaryAmount').val((Math.round(((this.value.numberValue(decimalPlace, thousandsSeperator))/100+1)*{!compensationPlans[person.id].employment.currentSalary}*100)/100).formatMoney(2, decimalPlace, thousandsSeperator));Recalc();" />% increase
+										</td>
+	                            	</tr>
+	                            </table>
+	                            </td>
+                                            </tr>
+                                        </table>
+                                    </apex:outputpanel>
+
+
+                                    <apex:outputpanel rendered="{!tmPermissionsList[person.id].salaryPlan && managerPolicy.Salary_Plan_Manager__c }">
+                                        <apex:outputpanel rendered="{!compensationPlans[person.id].salaryItem.approved}">
+                                            <table style="width:98%;">
+                                                <tr>
+                                                    <td style="width:50%;vertical-align: top;">
+                                                        <table class="detailList" style="width: 100%; ">
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Status__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:outputfield value="{!compensationPlans[person.id].salaryItem.HRRequest.Status__c}" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Effective_Date__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:outputfield value="{!compensationPlans[person.id].salaryItem.HRRequest.Effective_Date__c}" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Rationale__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:outputfield styleclass="rationale" value="{!compensationPlans[person.id].salaryItem.HRRequest.Rationale__c}" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                        </apex:outputpanel>
+
+
+                                        <apex:outputpanel rendered="{!!compensationPlans[person.id].salaryItem.approved}">
+
+                                            <table style="width:98%;">
+                                                <tr>
+                                                    <td style="width:50%;vertical-align: top;">
+                                                        <table class="detailList" style="width: 100%; ">
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Effective_Date__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:inputfield value="{!compensationPlans[person.id].salaryItem.HRRequest.Effective_Date__c}" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Rationale__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:inputfield styleclass="rationale" value="{!compensationPlans[person.id].salaryItem.HRRequest.Rationale__c}" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+
+
+                                        </apex:outputpanel>
+                                    </apex:outputpanel>
+
+
+
+
+
+                                   
+
+                                    <apex:outputpanel rendered="{!tmPermissionsList[person.id].bonusPlan && managerPolicy.fHCM2__Bonus_Plan_Manager__c}">
+                                        <div class="pbSubheader brandTertiaryBgr tertiaryPalette">
+                                            <h4>{!$Label.Process_Compensation_Planning_Bonus_Planning}</h4>
+                                        </div>
+                                        <table style="width: 98%; ">
+                                            <tr>
+                                                <td style="width:50%;vertical-align: top;">
+                                                    <table class="detailList" style="width: 100%; ">
+                                                        <apex:repeat value="{!tableBonus.columns}" var="f">
+                                                            <tr>
+                                                                <td class="subBlockLabel" ><apex:outputlabel value=" {!f.name}" /></td>
+                                                                <td class="subBlockData" ><apex:outputtext value="{!compensationPlans[person.id].attributes[f.name]}" /></td>
+                                                            </tr>
+                                                        </apex:repeat>
+                                                    </table>
+                                                </td>
+
+                                                <td style="width: 50%; vertical-align: top; ">
+                                                    <table class="detailList" style="width: 100%;">
+                                                        <tr>
+                                                            <td class="subBlockLabel" >
+                                                                {!$Label.Process_Compensation_Plan_Months_Since_Last_Paid_Bonus}
+                                                            </td>
+                                                            <td class="subBlockData" >
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.monthsLastPaid}" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="subBlockLabel" >
+                                                                {!$Label.Process_Compensation_Plan_Last_Paid_Bonus}
+                                                            </td>
+                                                            <td class="subBlockData" >
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.lastPaidBonus}" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="subBlockLabel" >
+                                                                {!$Label.Process_Salary_Plan_Suggested}
+                                                            </td>
+                                                            <td class="subBlockData">
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.suggestedBonusString}" />
+                                                                &nbsp;or&nbsp;
+                                                                <apex:outputtext value="{!compensationPlans[person.id].employment.suggestedBonusPercentageString}" />% current salary
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="subBlockLabel" >
+                                                                {!$Label.Process_Salary_Plan_Proposed}
+                                                            </td>
+                                                            <td class="subBlockData" id="{!person.id}-bonus" >
+                                                                <apex:inputtext value="{!compensationPlans[person.id].bonusItem.BonusAmount}" style="width:150px" styleclass="bonusAmount" disabled="{!compensationPlans[person.id].bonusItem.approved}" onkeyup="calculateBonusPercentage(this.value.numberValue(decimalPlace, thousandsSeperator), '{!person.id}');" />
+                                                                &nbsp;or&nbsp;
+                                                                <apex:inputtext value="{!compensationPlans[person.id].bonusItem.BonusPercent}" styleclass="bonusPercent" disabled="{!compensationPlans[person.id].bonusItem.approved}" style="width:50px;" onkeyup="calculateBonusValue(this.value.numberValue(decimalPlace, thousandsSeperator), '{!person.id}');" />% current salary
+
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </apex:outputpanel>
+                                    <apex:outputpanel rendered="{!tmPermissionsList[person.id].bonusPlan && managerPolicy.Bonus_Plan_Manager__c }">
+                                        <apex:outputpanel rendered="{!compensationPlans[person.id].bonusItem.approved}">
+                                            <table style="width:98%;">
+                                                <tr>
+                                                    <td style="width:50%;vertical-align: top;">
+                                                        <table class="detailList" style="width: 100%; ">
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Status__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:outputfield value="{!compensationPlans[person.id].bonusItem.HRRequest.Status__c}" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Effective_Date__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:outputfield value="{!compensationPlans[person.id].bonusItem.HRRequest.Effective_Date__c}" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Rationale__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:outputfield styleclass="rationale" value="{!compensationPlans[person.id].bonusItem.HRRequest.Rationale__c}" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                        </apex:outputpanel>
+
+
+                                        <apex:outputpanel rendered="{!!compensationPlans[person.id].bonusItem.approved}">
+
+                                            <table style="width:98%;">
+                                                <tr>
+                                                    <td style="width:50%;vertical-align: top;">
+                                                        <table class="detailList" style="width: 100%; ">
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Effective_Date__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:inputfield value="{!compensationPlans[person.id].bonusItem.HRRequest.Effective_Date__c}" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 33%; vertical-align: top;" class="subBlockLabel">
+                                                                    <apex:outputlabel value="{!$ObjectType.fHCM2__HR_Request__c.fields.fHCM2__Rationale__c.Label}"></apex:outputlabel>
+                                                                </td>
+                                                                <td class="statusData">
+                                                                    <apex:inputfield styleclass="rationale" value="{!compensationPlans[person.id].bonusItem.HRRequest.Rationale__c}" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+
+
+                                        </apex:outputpanel>
+         </apex:outputpanel>
+                                       
+</c:PersonSection>
+	                </apex:repeat>
+                        </apex:pageblocksection>
+                        <apex:pageblockbuttons location="bottom">
+                            <apex:commandbutton action="{!save}" value="{!$Label.fhcm2__Button_Save}" />
+                            <apex:commandbutton action="{!cancel}" value="{!$Label.fhcm2__Button_Cancel}" immediate="true" />
+                        </apex:pageblockbuttons>
+                    </apex:pageblock>
+            </apex:form>
+            <c:Notice viewer="{!viewer}" page="SalaryPlanTeam" location="Footer"/>
+        </apex:define>
+
+        <apex:define name="footerPanel">
+        	<c:FairsailFooter viewer="{!viewer}" />
+        </apex:define>
+    </apex:composition>
+    </div>
+</apex:page>

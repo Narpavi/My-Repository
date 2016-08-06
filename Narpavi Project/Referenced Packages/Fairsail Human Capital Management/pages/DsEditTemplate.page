@@ -1,0 +1,39 @@
+<apex:page standardcontroller="fHCM2__DocuSignTemplate__c" extensions="fHCM2.DsTemplateEditExtensionController" tabstyle="fHCM2__DocuSignTemplate__c">
+    <apex:sectionheader title="{!$ObjectType.fHCM2__DocuSignTemplate__c.label}" subtitle="{!fHCM2__DocuSignTemplate__c.Name}" />
+    <!--<apex:messages />-->
+    <apex:pagemessages id="showmsg"></apex:pagemessages>
+    <apex:form >
+        <apex:actionfunction action="{!refreshFields}" name="refreshFields" immediate="true" rerender="objectIdSection">
+            <apex:param name="objName" value="" />
+        </apex:actionfunction>
+        <apex:pageblock title="">
+            <apex:pageblockbuttons >
+                <apex:commandbutton value="{!$Label.fhcm2__Button_Save}" action="{!save}"></apex:commandbutton>
+                <apex:commandbutton value="{!$Label.fhcm2__Button_Cancel}" action="{!cancel}"></apex:commandbutton>
+            </apex:pageblockbuttons>
+            <apex:pageblocksection columns="1" title="{!$Label.fhcm2__Global_Information}" collapsible="false">
+                <apex:outputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__Template_ID__c}" />
+                <apex:outputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__TemplateName__c}" />
+                <apex:outputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__Description__c}" />
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" title="{!$Label.fhcm2__Global_Details}" collapsible="false" showheader="true">
+                <apex:inputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__Status__c}" />
+                <!--<apex:selectlist value="{!fHCM2__DocuSignTemplate__c.fHCM2__ParentObjectAPIName__c}" required="true" size="1" style="width:250px" onchange="alert(this.value);refreshFields(this.value);">-->
+                <apex:selectlist value="{!fHCM2__DocuSignTemplate__c.fHCM2__ParentObjectAPIName__c}" required="true" size="1" style="width:250px" onchange="refreshFields(this.value);">
+                    <apex:selectoptions value="{!SupportedObjects}" />
+                </apex:selectlist>
+                <apex:selectlist value="{!fHCM2__DocuSignTemplate__c.fHCM2__ReturnObjectAPIName__c}" required="true" size="1" style="width:250px">
+                    <apex:selectoptions value="{!SupportedObjects}" />
+                </apex:selectlist>
+                <!---->
+                <apex:selectlist value="{!fHCM2__DocuSignTemplate__c.fHCM2__ReturnObjectId__c}" required="true" size="1" style="width:250px" id="objectIdSection">
+                    <apex:selectoptions value="{!ParentObjectFields}" />
+                </apex:selectlist>
+                <!---->
+                <!--<apex:inputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__ReturnObjectId__c}" required="true" style="width:400px" />-->
+                <apex:inputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__EmailSubject__c}" required="true" style="width:400px" />
+                <apex:inputfield value="{!fHCM2__DocuSignTemplate__c.fHCM2__EmailMessage__c}" required="true" style="width:400px" />
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

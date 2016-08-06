@@ -1,0 +1,63 @@
+<apex:page standardcontroller="fHCM2__Job_History__c" extensions="fHCM2.JobHistoryExtensionController">
+    <apex:sectionheader title="{!$ObjectType.fHCM2__Job_History__c.label}" subtitle="{!teamMemberName}" help="/apex/Help?obj=fHCM2__Job_History__c" />
+    <apex:form >
+        <apex:pagemessages />
+        <apex:pageblock title="Edit" mode="edit">
+            <apex:pageblockbuttons >
+                <apex:commandbutton action="{!cancel}" value="{!$Label.fhcm2__Button_Cancel}" immediate="true" />
+                <apex:commandbutton action="{!save}" value="{!$Label.fhcm2__Button_Save}" rendered="{!!effectiveDateWarning}" />
+                <apex:commandbutton action="{!saveWithoutDateCheck}" value="{!$Label.fhcm2__Button_Confirm}" rendered="{!effectiveDateWarning}"/>
+            </apex:pageblockbuttons>
+
+            <apex:pageblocksection title="{!$ObjectType.fHCM2__Job_History__c.label}" columns="1">
+                <apex:pageblocksectionitem >
+                    <c:FieldLabelHelp name="fHCM2__Team_Member__c" object="{!employmentRecord}"/>
+                    <apex:outputlabel value="{!teamMemberName}" />
+                </apex:pageblocksectionitem>
+                <apex:inputfield value="{!fHCM2__Job_History__c.Name}" />
+                <apex:repeat value="{!jobHistoryFields}" var="f">
+                    <apex:pageblocksectionitem >
+                        <c:FieldLabelHelp name="{!f}" object="{!fHCM2__Job_History__c}"/>
+                        <apex:outputpanel >
+                            <c:ProxyFieldInput extensible="true" proxyname="{!f}" proxyobject="{!fHCM2__Job_History__c}" object="{!teamMemberRecord}" name="{!f}" rendered="{!isTeamMember[f]}" original="fHCM2__Manager__c"/>
+
+                            <apex:outputfield value="{!teamMemberRecord[f]}" rendered="{!isTeamMember[f]}" />
+
+                            <c:ProxyFieldInput extensible="true" proxyname="{!f}" proxyobject="{!fHCM2__Job_History__c}" object="{!employmentRecord}" name="{!f}" rendered="{!!isTeamMember[f]}"/>
+                            <apex:outputfield value="{!employmentRecord[f]}" rendered="{!!isTeamMember[f]}" />
+                        </apex:outputpanel>
+                    </apex:pageblocksectionitem>
+                </apex:repeat>
+            </apex:pageblocksection>
+
+            <apex:pageblocksection title="Effective Date" columns="1">
+                <apex:inputfield value="{!fHCM2__Job_History__c.fHCM2__Effective_Date__c}" required="true" rendered="{!ISBLANK(fHCM2__Job_History__c.fHCM2__Processed_Date__c)==TRUE}" />
+                <apex:outputfield value="{!fHCM2__Job_History__c.fHCM2__Effective_Date__c}" rendered="{!ISNULL(fHCM2__Job_History__c.fHCM2__Processed_Date__c)==FALSE}" />
+            </apex:pageblocksection>
+        </apex:pageblock>
+
+        <apex:pageblock title="{!$Label.fhcm2__Job_History_Future_Updates}" rendered="{!isUsingFutureDatedJobHistories && (hasPendingJobHistories || hasPendingHRRequests)}">
+
+            <apex:pageblocksection title="{!$Label.fhcm2__Job_History_HRRequest}" columns="1" rendered="{!hasPendingHRRequests}">
+                <apex:pageblocktable value="{!pendingHRRequests}" var="pendingHRRequest">
+                    <apex:column headervalue="{!$ObjectType.fHCM2__HR_Request__c.label}" style="width:100px"><apex:outputlink value="/{!pendingHRRequest['id']}">{!pendingHRRequest['name']}</apex:outputlink></apex:column>
+                    <apex:repeat value="{!pendingHRFields}" var="field1">
+                        <apex:column headervalue="{!pendingHRFields[field1]}" style="width:100px"><apex:outputfield value="{!pendingHRRequest[field1]}" /></apex:column>
+                </apex:repeat>
+                    <apex:column ></apex:column>
+                </apex:pageblocktable>
+            </apex:pageblocksection>
+
+
+            <apex:pageblocksection title="{!$Label.fhcm2__Job_History_PendingJH}" columns="1" rendered="{!hasPendingJobHistories}">
+                <apex:pageblocktable value="{!pendingJobHistories}" var="pendingJobHistory">
+                    <apex:column headervalue="{!$ObjectType.fHCM2__Job_History__c.label}" style="width:100px"><apex:outputlink value="/{!pendingJobHistory['id']}">{!pendingJobHistory['name']}</apex:outputlink></apex:column>
+                    <apex:repeat value="{!pendingJobHistoryFields}" var="field">
+                        <apex:column headervalue="{!pendingJobHistoryFields[field]}"><apex:outputfield value="{!pendingJobHistory[field]}" /></apex:column>
+                    </apex:repeat>
+                    <apex:column ></apex:column>
+                </apex:pageblocktable>
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

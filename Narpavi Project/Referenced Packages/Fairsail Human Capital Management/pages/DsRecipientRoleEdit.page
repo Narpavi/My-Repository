@@ -1,0 +1,36 @@
+<apex:page standardcontroller="fHCM2__RecipientRole__c" extensions="fHCM2.DsRecipientRoleEditExtensionController" tabstyle="fHCM2__DocuSignTemplate__c">
+    <apex:sectionheader title="{!$ObjectType.fHCM2__RecipientRole__c.label}" subtitle="{!fHCM2__RecipientRole__c.Name}" />
+    <apex:messages />
+    <apex:pagemessages id="showmsg"></apex:pagemessages>
+    <apex:form >
+        <apex:actionfunction action="{!toggleWriteIn}" name="toggleWriteIn" immediate="true" rerender="editSection"></apex:actionfunction>
+        <apex:pageblock title="">
+            <apex:pageblockbuttons >
+                <apex:commandbutton value="{!$Label.fhcm2__Button_Save}" action="{!save}"></apex:commandbutton>
+                <apex:commandbutton value="{!$Label.fhcm2__Button_Cancel}" action="{!cancel}"></apex:commandbutton>
+            </apex:pageblockbuttons>
+            <apex:pageblocksection columns="1" title="{!$Label.fhcm2__Global_Information}" collapsible="false">
+                <apex:outputfield value="{!fHCM2__RecipientRole__c.fHCM2__RoleName__c}" />
+                <apex:outputfield value="{!fHCM2__RecipientRole__c.fHCM2__RoleType__c}" />
+                <apex:outputfield value="{!fHCM2__RecipientRole__c.fHCM2__RoutingOrder__c}" />
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="1" title="{!$Label.fhcm2__Global_Details}" collapsible="false" showheader="true" id="editSection">
+                <apex:inputcheckbox value="{!fHCM2__RecipientRole__c.fHCM2__WriteIn__c}" onclick="toggleWriteIn();" />
+                <!--
+                <apex:inputfield value="{!fHCM2__RecipientRole__c.fHCM2__RecipientEmailAddress__c}" required="true" style="width:250px" />
+                <apex:inputfield value="{!fHCM2__RecipientRole__c.fHCM2__RecipientName__c}" style="width:250px" />
+                -->
+                <!---->
+                <apex:inputfield value="{!fHCM2__RecipientRole__c.fHCM2__RecipientEmailAddress__c}" required="true" style="width:250px" rendered="{!writeIn}" />
+                <apex:selectlist value="{!fHCM2__RecipientRole__c.fHCM2__RecipientEmailAddress__c}" required="true" size="1" style="width:250px" rendered="{!!writeIn}">
+                    <apex:selectoptions value="{!ParentObjectFields}" />
+                </apex:selectlist>
+                <apex:inputfield value="{!fHCM2__RecipientRole__c.fHCM2__RecipientName__c}" required="true" style="width:250px" rendered="{!writeIn}" />
+                <apex:selectlist value="{!fHCM2__RecipientRole__c.fHCM2__RecipientName__c}" required="true" size="1" style="width:250px" rendered="{!!writeIn}">
+                    <apex:selectoptions value="{!ParentObjectFields}" />
+                </apex:selectlist>
+                <!---->
+            </apex:pageblocksection>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

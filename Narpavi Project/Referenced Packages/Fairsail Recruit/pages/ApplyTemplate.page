@@ -1,0 +1,473 @@
+<apex:page applyHtmlTag="true" applyBodyTag="false" >
+<head>
+	<c:Notice page="ApplyTemplate" location="Header" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+	
+	<apex:stylesheet value="{!$Resource.fRecruit__ApplyPortalCSS}"/>
+	<apex:stylesheet value="{!$Setup.Apply_Portal__c.Stylesheet__c}"/>
+	<apex:insert name="head"/>
+	
+	<apex:stylesheet value="{!urlfor($Resource.fRecruit__jqueryUI,'/css/overcast/jquery-ui-1.7.2.custom.css')}"/>
+    <apex:includeScript value="{!urlfor($Resource.fRecruit__jqueryUI,'/js/jquery-1.3.2.min.js')}" />
+    <apex:includeScript value="{!urlfor($Resource.fRecruit__jqueryUI,'/js/jquery-ui-1.7.2.custom.min.js')}" />
+    <apex:includeScript value="{!urlfor($Resource.fRecruit__jqueryUI,'/js/autoresize.jquery.js')}" />
+    <script language="javascript">
+        jQuery.noConflict();
+        
+        function adjust_iframe_height(){
+			if (chainOnload!=null) chainOnload();
+				try {
+				    var actual_height = document.getElementById('mainPageDivId').scrollHeight;
+				    parent.postMessage(actual_height,"*"); 
+			    } catch (err) {}
+		}
+    </script>
+	
+	<apex:variable var="foo" rendered="{!IF(Contains($CurrentPage.Name, 'Apply'), $Setup.Apply_Portal__c.Use_Responsive_Layout__c, false)}" value="1">
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500,700' rel='stylesheet' type='text/css'/>
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"/>
+	<script>
+		jQuery(document).ready(function () {
+			   if (jQuery('.right-column .main').is(':empty')) {
+			        jQuery('.right-column').remove()
+			        jQuery('.main-column').removeClass('col-sm-7').addClass('col-sm-9');
+			    }
+			    
+			     if (jQuery('.footer .main').is(':empty')) {
+			        jQuery('.footer').remove()
+			    }
+				
+				if (jQuery('.header .main').is(':empty')) {
+			        jQuery('.header').remove()
+			    }
+			    		
+			    jQuery('.navbar-handle').bind('click',function(){
+			       	jQuery('.menuPanel ul').slideToggle();
+			    });
+			
+			    jQuery(window).resize(function() {
+			        if (window.matchMedia("(min-width: 768px)").matches) {
+			            jQuery('.menuPanel ul').show();
+			        }else{
+			            jQuery('.menuPanel ul').hide();
+			        }
+			
+			    });
+			    
+			
+		});
+	</script>
+	<style>
+		body {
+		    font-family: 'Roboto', sans-serif;
+		    background: #E9EDEF;
+		}
+		
+		
+		.responsive-container{
+			margin-top:20px;
+			margin-bottom:20px;
+		}
+		
+		.header {
+		    margin-top: 20px;
+		}
+		
+		.main-container {
+		    margin-top: 20px;
+		}
+		
+		.footer {
+		    margin-top: 20px;
+		}
+		
+		h1, h2{
+			margin:0;
+		}
+		
+		h2{
+			margin-top:5px;
+		}
+		
+		.menuPanel ul{
+		    list-style: none;
+		    margin: 0;
+		    padding: 0;
+		    background:#fff;
+		    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+		    width:100%;
+		    margin: auto ;
+		    padding-left:0px;
+		    font-size:13px;
+		    border-radius: 0px;
+		    border:0px;
+		}
+		
+		.menuPanel ul li {
+		    color: #222222;
+		    border-bottom: 1px solid #EBEBEB;
+		    cursor: pointer;
+		    margin:0px;
+		}
+		
+		
+		.menuPanel ul li a {
+		    color: #222222;
+		    display: inline-block;
+		    width: 100%;
+		    padding: 18px;
+		    transition: all .3s;
+		    -webkit-transition: all .3s;
+		    -moz-transition: all .3s;
+		    text-decoration: none;
+		}
+		
+		.menuPanel ul li a:hover {
+		    padding-left: 30px;
+		    border-left:3px solid #0389D1;
+		
+		}
+		
+		.navbar-handle {
+		    display: none;
+		}
+		
+		.main-column .main, .footer .main, .header .main, .right-column .main {
+		    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+		    background:#fff;
+		    padding: 20px;
+		}
+		
+		.main-column .main img, .footer .main img, .right-column .main img, .header .main img,  .left-column .main img{
+			max-width: 100%; 
+			height: auto;
+		}
+		
+		.form-control{
+		    border-radius: 0px;
+		   	padding: 5px 12px;
+		   	width:100%;
+
+		}
+		
+		
+		.input-group-btn > .btn-primary, .pbButton .btn-primary, 
+		.pbButtonb .btn-primary, .text-container .btn-primary,
+		.table-responsive .btn-primary{
+			 display: inline-block;
+			  margin-bottom: 1px;
+			  font-weight: normal;
+			  text-align: center;
+			  vertical-align: middle;
+			  touch-action: manipulation;
+			  cursor: pointer;
+			  background-image: none;
+			  white-space: nowrap;
+			  padding: 5px 12px;
+			  font-size: 13px;
+			  -webkit-user-select: none;
+			  -moz-user-select: none;
+			  -ms-user-select: none;
+			  user-select: none;
+			  background:#0389D1;
+			  border-radius: 0px;
+			  color:#fff;
+			  border:none;
+			   font-family: 'Roboto', sans-serif !important;
+			  
+		}
+		
+		.input-group-btn > .btn-default, .pbButton .btn-default,
+		.pbButtonb .btn-default,.text-container .btn-default,
+		.table-responsive .btn-default{
+		     display: inline-block;
+			  margin-bottom: 1px;
+			  font-weight: normal;
+			  text-align: center;
+			  vertical-align: middle;
+			  touch-action: manipulation;
+			  cursor: pointer;
+			  background-image: none;
+			  white-space: nowrap;
+			  padding: 5px 12px;
+			  font-size: 13px;
+			  -webkit-user-select: none;
+			  -moz-user-select: none;
+			  -ms-user-select: none;
+			  user-select: none;
+			  background: #5bc0de;
+			  border-radius: 0px;
+			  color:#fff;
+			  border:none;
+			  font-family: 'Roboto', sans-serif !important;
+			  
+		}
+		
+		
+		input[type="text"] {
+		        padding: 5px 12px;
+		        width:275px !important;
+		}
+		
+		select{
+			padding: 7px 12px;
+		}
+		    
+		
+		
+		.pagingPanel{
+			float:none;
+			text-align:center;
+			border:none;
+		}
+		
+		.pagingPanel .link-pagination{
+				margin-left:10px;
+		}
+		
+		.table-responsive table td{
+			 font-family: 'Roboto', sans-serif !important;
+		}
+		
+		
+		.social{
+			list-style:none;
+			margin: 0;
+			padding: 0;
+			display:inline-block;
+		}
+		
+		.social li {
+		    display:inline-block;
+		    margin-left:2px;
+		}
+		
+		.social li a {
+		    opacity: .8;
+		    transition: all .3s;
+		    -webkit-transition: all .3s;
+		    -moz-transition: all .3s;
+		    color: #fff;
+		    display: inline-block;
+		    height: 25px;
+		    width: 25px;
+		    text-align: center;
+		    font-size: 13px;
+		    margin-top:3px;
+		}
+		
+		.social li a i{
+			margin-top:7px;
+		}
+		
+		.social li a:hover {
+		    opacity: 1
+		}
+		
+		.btn-share-facebook {
+		    background: #3c66c4;
+		}
+		
+		.btn-share-twitter {
+		    background: #3cf;
+		}
+		
+		.btn-share-linkedin {
+		    background: #0077B5;
+		}
+		
+		.btn-share-email {
+		    background: #E68523;
+		}
+		
+		.table-responsive table input[type="text"] {
+			width:100px;
+		
+		}
+		
+		.text-container{
+			padding:10px 20px 10px 20px;
+		}
+		
+		.noticeboard-containers{
+		    	margin-top:10px;
+		    	margin-bottom:10px;
+		}
+		
+		.custom-left-column{
+			padding-top:20px;
+		}
+		
+		.helpOrb{
+			width:20px !important;
+			height:15px !important;
+		}
+		
+		
+		
+		@media screen and (max-width: 767px) {
+		
+		    .main-column .main, .footer .main, .header .main, .right-column .main {
+		        box-shadow: none;
+		        padding: 0;
+		        background:none;
+		    }
+		
+		    .left-column {
+		        padding: 0px;
+		    }
+		
+		    .navbar-handle {
+		        display: block;
+		        width: 100%;
+		        padding: 10px;
+		        text-align: center;
+		        font-size: 20px;
+		        cursor: pointer;
+		        z-index: 999;
+		        position: fixed;
+		        top: 0px;
+		        right: 0px;
+		        left: auto;
+		        background-color: #0389D1;
+		        -webkit-box-shadow: -2px 5px 7px -5px rgba(0, 0, 0, 0.75);
+		        -moz-box-shadow: -2px 5px 7px -5px rgba(0, 0, 0, 0.75);
+		        box-shadow: -2px 5px 7px -5px rgba(0, 0, 0, 0.75);
+		        color: #fff;
+		    }
+		
+		    
+		    .header .main{
+		    	text-align:center;
+		    }
+		    
+		    .menuPanel ul  {
+		        display: none;
+		        position: fixed;
+		        top: 40px;
+		        right: 0px;
+		        left: auto;
+		        z-index: 888;
+		        width: 100%;
+		        -webkit-box-shadow: -2px 5px 7px -5px rgba(0, 0, 0, 0.75);
+		        -moz-box-shadow: -2px 5px 7px -5px rgba(0, 0, 0, 0.75);
+		        box-shadow: -2px 5px 7px -5px rgba(0, 0, 0, 0.75);
+		        background: #fff;
+		    }
+		
+		    .menuPanel ul li {
+		        display: block;
+		        width: 100%;
+		        text-align: center;
+		        background: #fff;
+		        cursor: pointer;
+		        border-bottom: 1px solid #D7D7D7;
+		    }
+		
+		    .menuPanel ul li a:hover {
+		        border-left: none;
+		        padding: 18px;
+		    }
+		    
+		    input[type="text"] {
+		            width:auto !important;
+		    }
+		    
+		    textarea {
+		            width:auto !important;
+		    }
+		    
+		    .custom-select{
+		   	 	width: 150px !important;
+		    }
+		   }
+		   
+		   @media screen and (max-width: 480px) {
+			   select{
+				padding: 7px 15px;
+			    }
+	 			.helpButtonOn{
+					font-size:10px;
+				}
+				
+				input[type='file'] {
+	 				 color: transparent;
+	 				 width:120px;
+				}
+		}
+</style>
+	</apex:variable>
+</head>
+<body>
+
+<c:Notice page="ApplyTemplate" location="Top" />
+<apex:variable var="reponsiveLayout" rendered="{!IF(Contains($CurrentPage.Name, 'Apply') , $Setup.Apply_Portal__c.Use_Responsive_Layout__c, false)}" value="1">
+<div id="page{!$CurrentPage.Name}">
+	<div class="responsive-container container" id="mainPageDivId" >
+	    <div class="row header">
+	        <div class="col-sm-12">
+	            <div class="main"><apex:image styleClass="headerImage" value="{!$Setup.Apply_Portal__c.Header_Image__c}" rendered="{!!isblank($Setup.Apply_Portal__c.Header_Image__c)}"/><apex:insert name="header"/></div>
+	        </div>
+	    </div>
+	    <div class="row main-container">
+	        <div class="col-sm-3 left-column">
+	        	<apex:insert name="left"/>
+	        </div>
+	        <div class="col-sm-7 main-column">
+	            <div class="main">
+	                <apex:insert name="body"/>
+	            </div>
+	        </div>
+	        <div class="col-sm-2 right-column">
+	            <div class="main"><apex:insert name="right"/></div>
+	        </div>
+	    </div>
+	     <div class="row">
+	        <div class="col-sm-12 hidden-sm hidden-md hidden-lg">
+	            <apex:insert name="leftResponsive"/>
+	        </div>
+	    </div>
+	    <div class="row footer">
+	        <div class="col-sm-12">
+	            <div class="main"><apex:insert name="footer"/></div>
+	        </div>
+	    </div>
+	 </div>
+</div>
+</apex:variable>
+<apex:variable var="notReponsiveLayout" rendered="{!IF(Contains($CurrentPage.Name, 'Apply'), !$Setup.Apply_Portal__c.Use_Responsive_Layout__c, true)}" value="1">
+	<div id="page{!$CurrentPage.Name}">
+		<div id="mainPageDivId" class="mainPageDiv">
+		  <div class="headerDiv">
+		  <apex:image styleClass="headerImage" value="{!$Setup.Apply_Portal__c.Header_Image__c}" rendered="{!!isblank($Setup.Apply_Portal__c.Header_Image__c)}"/>
+		  <apex:insert name="header"/>
+		  </div>
+		  <table><tr>
+			  <td class="leftColumn">
+			  	<apex:insert name="left"/>
+			  </td>
+			  <td class="bodyColumn">
+			  	<apex:insert name="body"/>
+			  </td>
+			  <td class="rightColumn">
+			  	<apex:insert name="right"/>
+			  </td>
+		  </tr></table>
+		  <apex:insert name="footer"/>
+		  <div class="poweredBy">Powered by <a href="http://www.fairsail.com">Fairsail Recruit</a></div>
+		</div>
+	</div>	
+</apex:variable>
+<c:Notice page="ApplyTemplate" location="Bottom" />
+
+
+</body>
+<site:googleAnalyticsTracking />
+<script type="text/javascript">
+	var chainOnload = window.onload;
+	window.onload = adjust_iframe_height;
+</script>
+</apex:page>

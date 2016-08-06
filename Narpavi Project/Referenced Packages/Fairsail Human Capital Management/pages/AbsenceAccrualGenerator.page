@@ -1,0 +1,58 @@
+<apex:page standardcontroller="fHCM2__Absence_Accrual_Rule__c" extensions="fHCM2.AbsenceAccrualGeneratorController" standardstylesheets="true" sidebar="false" title="Absence Profile">
+    <apex:form >
+        <apex:pageblock title="{!$Label.fhcm2__Process_Absence_Accrual_Rule_Create}" rendered="true">
+            <apex:messages />
+            <apex:pageblockbuttons >
+                <apex:commandbutton action="{!cancel}" immediate="true" value="{!$Label.fhcm2__Button_Cancel}" />
+                <apex:commandbutton action="{!submit}" immediate="false" value="{!$Label.fhcm2__Button_Submit}" />
+            </apex:pageblockbuttons>
+                <apex:pageblocksection columns="1">
+                    <apex:inputfield required="true" value="{!absenceAccrual.fHCM2__Effective_Date__c}" />
+                </apex:pageblocksection>
+            <apex:pageblocksection title="{!$Label.fhcm2__Process_Absence_Accrual_Rule_CalOverride}" columns="1">
+                <apex:pageblockSectionItem >
+                    <apex:outputtext ></apex:outputtext>
+                    <apex:outputtext >{!$Label.fhcm2__Process_Absence_Accrual_Rule_CalOverride_Help}</apex:outputtext>
+                </apex:pageblockSectionItem>
+                <apex:inputfield required="false" value="{!absenceAccrual.fHCM2__Accrual__c}" />
+                <apex:inputfield required="false" value="{!absenceAccrual.fHCM2__Carry_Over__c}" />
+                <apex:inputfield required="false" value="{!absenceAccrual.fHCM2__Time_In_Lieu__c}" />
+                <apex:inputfield required="false" value="{!absenceAccrual.fHCM2__Next_Accrual__c}" />
+            </apex:pageblocksection>
+                <apex:outputpanel >
+                    <apex:outputpanel styleclass="popupBackground" layout="block" rendered="{!displayPopUp}" />
+                    <apex:outputpanel styleclass="custPopup" layout="block" rendered="{!displayPopUp}">
+                        {!$Label.Process_Absence_Accrual_Rule_WaitForEmail}<br /><br /><br />
+                        <apex:commandbutton value="OK" action="{!closePopup}" />
+                    </apex:outputpanel>
+                </apex:outputpanel>
+        </apex:pageblock>
+    </apex:form>
+
+    <style type="text/css">
+        .custPopup {
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding: 10px;
+            position: absolute;
+            width: 500px;
+            margin-left: -250px;
+            top: 100px;
+        }
+
+        .popupBackground {
+            background-color: black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+    </style>
+</apex:page>

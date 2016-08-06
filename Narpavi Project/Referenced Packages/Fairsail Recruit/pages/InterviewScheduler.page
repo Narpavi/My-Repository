@@ -1,0 +1,212 @@
+<apex:page controller="fRecruit.InterviewSchedulerController">
+<apex:includeScript value="{!URLFOR($Resource.fRecruit__FormGen, 'jquery.js')}"/>
+<script>
+
+	function doSetInterviewer (element){
+		console.log('element->hit');
+		console.log('element->' + element.value);
+		console.log('element->' + JSON.stringify(element));
+		jQuery(".interviewerClass").val(element.value); 
+	}
+</script>
+
+<apex:form >
+	<style>
+		body .bPageBlock .pbBody .custom-color .pbSubheader{
+            background-color:#5FACF0;
+        }
+        
+		.eventPanel{
+			width:300px;
+			sborder-style: solid;
+			sborder-width: 1px;
+            float: left;
+            margin: 30px 10px 0px 0px;
+		}
+	</style>
+
+	<apex:pageBlock title="Interview Scheduler"  mode="new" id="rerenderblock">
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+				<apex:commandButton action="{!saveOnly}" value="Save"/>
+			</apex:pageBlockButtons>
+		<apex:pageMessages />	
+		
+		<apex:pageBlockSection columns="2">
+			<apex:inputField value="{!interviewer.OwnerId}" label="Default Interviewer:" required="false" onchange="doSetInterviewer(this);"/>
+		</apex:pageBlockSection>
+								
+		<!--  List of Events to Schedule -->
+		<apex:repeat value="{!model.oApplicationInterviews}" var="app">
+			<apex:outputPanel layout="block" >
+		
+        <apex:tabPanel switchType="client" selectedTab="tabSummary" id="theTabPanel" rendered="true" styleClass="eventPanel"> 
+           <apex:tab label="{!app.oApplication.fRecruit__Candidate_Name__c} Interview for {!app.oApplication.Vacancy__r.Name} ({!app.oApplication.Name})" name="tabEvent" id="tabEventId">
+					
+					<apex:commandButton value="Remove Interview" action="{!removeInterview}" rerender="rerenderblock" immediate="true" rendered="false">
+						<apex:param name="deleteId" value="{!app.oApplication.id}" assignTo="{!deleteId}"/>
+			        </apex:commandButton>
+        					
+        			<apex:outputPanel styleClass="custom-color" layout="block">
+        					
+					<apex:pageBlockSection title="Details" columns="1">
+					 
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Application"/>
+							<apex:outputText value="{!app.oApplication.Name + ', ' + app.oCurrentInterview.oEvent.Id}"/>
+						</apex:pageBlockSectionItem>
+						
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Candidate Name"/>
+							<apex:outputText value="{!app.oApplication.fRecruit__Candidate_Name__c}"/>
+						</apex:pageBlockSectionItem>
+		
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Interviewer"/>
+							<apex:inputField value="{!app.oCurrentInterview.oEvent.OwnerId}" styleClass="interviewerClass" required="true"/>
+						</apex:pageBlockSectionItem>
+		
+						<apex:inputField value="{!app.oCurrentInterview.oEvent.Location}"  style="width:400px;"/>
+		
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Instructions"/>
+							<apex:inputTextArea value="{!app.oApplication.fRecruit__Interview_Instructions__c}" style="width:400px;"/>
+						</apex:pageBlockSectionItem>
+		
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Date"/>
+							<apex:inputField value="{!app.oCurrentInterview.oEvent.ActivityDate}" required="true"/>
+						</apex:pageBlockSectionItem>
+		
+		
+						<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Time"/>
+								<apex:outputPanel >
+									<apex:selectList value="{!app.oCurrentInterview.startHours}" multiselect="false" size="1" required="true">
+										<apex:selectOption itemValue="0" itemLabel="00"/>
+										<apex:selectOption itemValue="1" itemLabel="01"/>
+										<apex:selectOption itemValue="2" itemLabel="02"/>
+										<apex:selectOption itemValue="3" itemLabel="03"/>
+										<apex:selectOption itemValue="4" itemLabel="04"/>
+										<apex:selectOption itemValue="5" itemLabel="05"/>
+										<apex:selectOption itemValue="6" itemLabel="06"/>
+										<apex:selectOption itemValue="7" itemLabel="07"/>
+										<apex:selectOption itemValue="8" itemLabel="08"/>
+										<apex:selectOption itemValue="9" itemLabel="09"/>
+										<apex:selectOption itemValue="10" itemLabel="10"/>
+										<apex:selectOption itemValue="11" itemLabel="11"/>
+										<apex:selectOption itemValue="12" itemLabel="12"/>
+										<apex:selectOption itemValue="13" itemLabel="13"/>
+										<apex:selectOption itemValue="14" itemLabel="14"/>
+										<apex:selectOption itemValue="15" itemLabel="15"/>
+										<apex:selectOption itemValue="16" itemLabel="16"/>
+										<apex:selectOption itemValue="17" itemLabel="17"/>
+										<apex:selectOption itemValue="18" itemLabel="18"/>
+										<apex:selectOption itemValue="19" itemLabel="19"/>
+										<apex:selectOption itemValue="20" itemLabel="20"/>
+										<apex:selectOption itemValue="21" itemLabel="21"/>
+										<apex:selectOption itemValue="22" itemLabel="22"/>
+										<apex:selectOption itemValue="23" itemLabel="23"/>
+									</apex:selectList>
+									<apex:selectList value="{!app.oCurrentInterview.startMins}" multiselect="false" size="1" required="true">
+										<apex:selectOption itemValue="0" itemLabel=":00"/>
+										<apex:selectOption itemValue="5" itemLabel=":05"/>
+										<apex:selectOption itemValue="10" itemLabel=":10"/>
+										<apex:selectOption itemValue="15" itemLabel=":15"/>
+										<apex:selectOption itemValue="20" itemLabel=":20"/>
+										<apex:selectOption itemValue="25" itemLabel=":25"/>
+										<apex:selectOption itemValue="30" itemLabel=":30"/>
+										<apex:selectOption itemValue="35" itemLabel=":35"/>
+										<apex:selectOption itemValue="40" itemLabel=":40"/>
+										<apex:selectOption itemValue="45" itemLabel=":45"/>
+										<apex:selectOption itemValue="50" itemLabel=":50"/>
+										<apex:selectOption itemValue="55" itemLabel=":55"/>
+									</apex:selectList>
+								</apex:outputPanel>
+						</apex:pageBlockSectionItem>
+		
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Duration"/>
+								<apex:outputPanel >
+									<apex:selectList value="{!app.oCurrentInterview.durationHours}" multiselect="false" size="1" required="true">
+										<apex:selectOption itemValue="0" itemLabel="0"/>
+										<apex:selectOption itemValue="1" itemLabel="1"/>
+										<apex:selectOption itemValue="2" itemLabel="2"/>
+										<apex:selectOption itemValue="3" itemLabel="3"/>
+										<apex:selectOption itemValue="4" itemLabel="4"/>
+										<apex:selectOption itemValue="5" itemLabel="5"/>
+										<apex:selectOption itemValue="6" itemLabel="6"/>
+										<apex:selectOption itemValue="7" itemLabel="7"/>
+										<apex:selectOption itemValue="8" itemLabel="8"/>
+										<apex:selectOption itemValue="9" itemLabel="9"/>
+										<apex:selectOption itemValue="10" itemLabel="10"/>
+										<apex:selectOption itemValue="11" itemLabel="11"/>
+										<apex:selectOption itemValue="12" itemLabel="12"/>
+									</apex:selectList>&nbsp;hours&nbsp;&nbsp;
+									<apex:selectList value="{!app.oCurrentInterview.durationMins}" multiselect="false" size="1" required="true">
+										<apex:selectOption itemValue="0" itemLabel=":00"/>
+										<apex:selectOption itemValue="5" itemLabel=":05"/>
+										<apex:selectOption itemValue="10" itemLabel=":10"/>
+										<apex:selectOption itemValue="15" itemLabel=":15"/>
+										<apex:selectOption itemValue="20" itemLabel=":20"/>
+										<apex:selectOption itemValue="25" itemLabel=":25"/>
+										<apex:selectOption itemValue="30" itemLabel=":30"/>
+										<apex:selectOption itemValue="35" itemLabel=":35"/>
+										<apex:selectOption itemValue="40" itemLabel=":40"/>
+										<apex:selectOption itemValue="45" itemLabel=":45"/>
+										<apex:selectOption itemValue="50" itemLabel=":50"/>
+										<apex:selectOption itemValue="55" itemLabel=":55"/>
+									</apex:selectList>&nbsp;minutes
+								</apex:outputPanel>
+						</apex:pageBlockSectionItem>
+						
+						<apex:inputField value="{!app.oApplication.fRecruit__Interview_Status__c}" required="true"/>
+		
+					</apex:pageBlockSection>
+		
+		
+		
+					<apex:pageBlockSection title="Notes" columns="1">
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Description"/>
+							<apex:inputTextarea value="{!app.oCurrentInterview.oEvent.Description}" rows="5" style="width:400px"/>
+						</apex:pageBlockSectionItem>
+					</apex:pageBlockSection>
+		
+					<apex:pageBlockSection title="Reminder" columns="1">
+			        	<apex:pageBlockSectionItem >
+							<apex:outputLabel value="Before start"/>
+							<apex:outputPanel >
+								<apex:inputCheckbox value="{!app.oCurrentInterview.oEvent.IsReminderSet}"/>
+								<apex:selectList value="{!app.oCurrentInterview.reminder}" multiselect="false" size="1">
+									<apex:selectOption itemValue="0" itemLabel="0 mins"/>
+									<apex:selectOption itemValue="5" itemLabel="5 mins"/>
+									<apex:selectOption itemValue="10" itemLabel="10 mins"/>
+									<apex:selectOption itemValue="15" itemLabel="15 mins"/>
+									<apex:selectOption itemValue="30" itemLabel="30 mins"/>
+									<apex:selectOption itemValue="60" itemLabel="1 hour"/>
+									<apex:selectOption itemValue="120" itemLabel="2 hours"/>
+									<apex:selectOption itemValue="180" itemLabel="3 hours"/>
+									<apex:selectOption itemValue="240" itemLabel="4 hours"/>
+									<apex:selectOption itemValue="300" itemLabel="5 hours"/>
+									<apex:selectOption itemValue="360" itemLabel="6 hours"/>
+									<apex:selectOption itemValue="420" itemLabel="7 hours"/>
+									<apex:selectOption itemValue="480" itemLabel="8 hours"/>
+									<apex:selectOption itemValue="720" itemLabel="1/2 day"/>
+									<apex:selectOption itemValue="1440" itemLabel="1 day"/>
+									<apex:selectOption itemValue="2880" itemLabel="2 days"/>
+								</apex:selectList>
+							</apex:outputPanel>
+						</apex:pageBlockSectionItem>
+					</apex:pageBlockSection>
+					</apex:outputPanel>
+			</apex:tab>
+			</apex:tabPanel>           
+			</apex:outputPanel>			
+		</apex:repeat>
+		<apex:outputLabel value="{!debugStr}" rendered="false"> </apex:outputLabel>
+
+	</apex:pageBlock>
+</apex:form>
+
+</apex:page>

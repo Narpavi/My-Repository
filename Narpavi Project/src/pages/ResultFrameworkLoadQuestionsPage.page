@@ -1,0 +1,28 @@
+<!-- * Created By: Poornima -TPT
+     * Project Name: M&E Implementation
+     * Created Date: (04-APR-2016)
+     * Description:
+        1. Page to load the questions to the local browser cache as a JSON string
+-->
+
+<apex:page controller="ResultFrameworkController" applyHtmlTag="true" sidebar="false" showheader="false" cache="false">
+<script type="text/javascript">
+
+window.onload = function()
+{
+  if(navigator.onLine)
+   {      
+       var JSONStr={!questionsJSON};
+       if(localStorage.getItem("{!pfID}_Questions")!=null)
+       {
+           localStorage.removeItem("{!pfID}_Questions");
+       }
+       localStorage["{!pfID}_Questions"]=JSON.stringify(JSONStr);           
+   }
+   window.location.href = 'http://vso.force.com/ResultFrameworkPage?pfID={!pfID}';
+}
+</script>
+   <apex:form id="pfForm" > 
+
+</apex:form>
+</apex:page>
